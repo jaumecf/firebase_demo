@@ -1,3 +1,4 @@
+import 'package:firebase_demo/models/user.dart';
 import 'package:firebase_demo/services/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,14 @@ class HomeScreen extends StatelessWidget {
               }),
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => print('Obre nou'),
+        onPressed: () {
+          // Cream un usuari temporal nou, per diferenciar-lo d'un ja creat,
+          // per que aquest no tindrà id encara, i d'aquesta forma sabrem
+          // discernir al detailscreen que estam creant un usuari nou i no
+          // modificant un existent
+          userService.tempUser = User(edat: 0, nom: '', verificat: false);
+          Navigator.of(context).pushNamed('detail');
+        },
         child: const Icon(Icons.add),
       ),
     );

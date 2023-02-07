@@ -6,26 +6,30 @@ import 'package:provider/provider.dart';
 import '../ui/input_decorations.dart';
 
 class DetailScreen extends StatelessWidget {
-  const DetailScreen({Key? key}) : super(key: key);
+  DetailScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final userForm = Provider.of<UserService>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text('Detail Screen'),
       ),
       body: _UserForm(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => print('Obre nou'),
-        child: const Icon(Icons.add),
+        onPressed: () {
+          if (userForm.isValidForm()) {
+            userForm.saveOrCreateUser();
+            Navigator.of(context).pop();
+          }
+        },
+        child: const Icon(Icons.save),
       ),
     );
   }
 }
 
 class _UserForm extends StatelessWidget {
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
   @override
   Widget build(BuildContext context) {
     final userForm = Provider.of<UserService>(context);
@@ -38,7 +42,7 @@ class _UserForm extends StatelessWidget {
         width: double.infinity,
         decoration: _buildBoxDecoration(),
         child: Form(
-          key: formKey,
+          key: userForm.formKey,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             children: [

@@ -7,9 +7,15 @@ class UserService extends ChangeNotifier {
   final String _baseUrl =
       "fir-demo-acecf-default-rtdb.europe-west1.firebasedatabase.app";
   final List<User> users = [];
+  late User tempUser;
 
   UserService() {
     this.loadUsers();
+  }
+
+  updateVerification(bool value) {
+    this.tempUser.verificat = value;
+    notifyListeners();
   }
 
   loadUsers() async {

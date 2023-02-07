@@ -27,4 +27,6 @@ class User {
         "nom": nom,
         "verificat": verificat,
       };
+
+  User copy() => User(edat: edat, nom: nom, verificat: verificat);
 }

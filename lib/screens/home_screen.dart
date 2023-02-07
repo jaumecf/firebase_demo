@@ -11,20 +11,46 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userService = Provider.of<UserService>(context);
+    List<User> usuaris = userService.users;
     return Scaffold(
       appBar: AppBar(
         title: Text('Home Screen'),
       ),
-      body: userService.users.isEmpty
+      body: usuaris.isEmpty
           ? Loading()
           : ListView.builder(
-              itemCount: userService.users.length,
+              itemCount: usuaris.length,
               itemBuilder: ((context, index) {
-                return GestureDetector(
-                  child: UserCard(usuari: userService.users[index]),
-                  onTap: () {
-                    userService.tempUser = userService.users[index].copy();
-                    Navigator.of(context).pushNamed('detail');
+                return Dismissible(
+                  key: UniqueKey(),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    alignment: AlignmentDirectional.centerEnd,
+                    color: Colors.red,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
+                  ),
+                  child: GestureDetector(
+                    child: UserCard(usuari: usuaris[index]),
+                    onTap: () {
+                      userService.tempUser = usuaris[index].copy();
+                      Navigator.of(context).pushNamed('detail');
+                    },
+                  ),
+                  onDismissed: (direction) {
+                    if (usuaris.length < 2) {
+                      userService.loadUsers();
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content:
+                              Text('No es pot esborrar tots els elements!')));
+                    } else {
+                      userService.deleteUser(usuaris[index]);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              '${userService.users[index].nom} esborrat')));
+                    }
                   },
                 );
               }),

@@ -7,7 +7,7 @@ class UserService extends ChangeNotifier {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final String _baseUrl =
       "fir-demo-acecf-default-rtdb.europe-west1.firebasedatabase.app";
-  final List<User> users = [];
+  List<User> users = [];
   late User tempUser;
   User? newUser;
 
@@ -25,16 +25,16 @@ class UserService extends ChangeNotifier {
   }
 
   loadUsers() async {
+    users.clear();
     final url = Uri.https(_baseUrl, 'users.json');
     final response = await http.get(url);
-
     final Map<String, dynamic> usersMap = json.decode(response.body);
 
     // Mapejam la resposta del servidor, per cada usuari, el convertim a la classe i l'afegim a la llista
     usersMap.forEach((key, value) {
-      final tempUser = User.fromMap(value);
-      tempUser.id = key;
-      users.add(tempUser);
+      final auxUser = User.fromMap(value);
+      auxUser.id = key;
+      users.add(auxUser);
     });
 
     notifyListeners();
@@ -48,28 +48,26 @@ class UserService extends ChangeNotifier {
       //Actualitzam l'usuari
       await this.updateUser();
     }
-    notifyListeners();
+    loadUsers();
   }
 
-  Future<String> updateUser() async {
+  updateUser() async {
     final url = Uri.https(_baseUrl, 'users/${tempUser.id}.json');
     final response = await http.put(url, body: tempUser.toJson());
     final decodedData = response.body;
-
-    final index = this.users.indexWhere((element) => element.id == tempUser.id);
-    this.users[index] = tempUser;
-    return tempUser.id!;
   }
 
-  Future<String> createUser() async {
+  createUser() async {
     final url = Uri.https(_baseUrl, 'users.json');
     final response = await http.post(url, body: tempUser.toJson());
     final decodedData = json.decode(response.body);
-    print(decodedData);
-    tempUser.id = decodedData['name'];
+  }
 
-    // Falta posar ID del producte
-    this.users.add(tempUser);
-    return tempUser.id!;
+  deleteUser(User usuari) async {
+    final url = Uri.https(_baseUrl, 'users/${usuari.id}.json');
+    final response = await http.delete(url);
+    final decodedData = json.decode(response.body);
+    print(decodedData);
+    loadUsers();
   }
 }
